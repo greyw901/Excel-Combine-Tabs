@@ -1,0 +1,212 @@
+================================================================
+  Combine Excel Tabs — User Instruction
+================================================================
+
+----------------------------------------------------------------
+  FOR USERS
+----------------------------------------------------------------
+
+PURPOSE
+  Selects specific sheets from multiple Excel files in the
+  same folder and combines them into one new workbook, in
+  the order you specify.
+
+  Replaces the manual process of opening each file and
+  using Move or Copy Sheet one by one.
+
+STEP 1: Prepare Folder
+  Put the following in the SAME folder:
+    - Combine Excel Tabs.py
+    - All Excel source files (.xls / .xlsx / .xlsm / .xlsb)
+
+  Note: Only visible sheets are listed. Hidden sheets are
+        not shown and cannot be selected.
+
+STEP 2: Run
+  Double-click: Combine Excel Tabs.py
+
+STEP 3: Read the Sheet List
+  The script lists all visible sheets from every Excel file:
+
+    a - Job Summary.xlsx
+      a1 - Summary
+      a2 - Details
+      a3 - Movement
+
+    b - Job Status Report.xlsx
+      b1 - J153
+      b2 - J154
+      b3 - J155
+
+  Files are assigned letters (a, b, c..., z, aa, ab...)
+  in alphabetical order by filename.
+
+STEP 4: Enter Selection
+  At the prompt, type your selection and press Enter:
+
+    Enter selection (e.g. a1, b1-b4, a3), or 'quit' to exit:
+
+  Input syntax:
+    a1          : single sheet
+    b1-b4       : range within same file (b1, b2, b3, b4)
+    a           : all sheets from file a
+    a1, b, a3   : mix of singles, ranges, and full files
+    quit        : exit without doing anything
+
+  Sheets are copied in the ORDER you type them.
+  Commas and spaces are both accepted as separators.
+  You can also close the console window at any time to exit.
+
+STEP 5: Confirm
+  After entering your selection, a summary is shown:
+
+    Selection summary (4 sheet(s)):
+      Job Summary.xlsx
+        a1 - Summary
+        a3 - Movement
+      Job Status Report.xlsx
+        b1 - J153
+        b2 - J154
+
+    Proceed? Y / Enter to confirm, N to re-enter, 'quit' to exit:
+
+  Y or Enter  : proceed with copy
+  N           : go back and re-enter selection
+  quit        : exit without doing anything
+
+STEP 6: Output
+  A new file is created in the same folder:
+
+    Combined_YYYYMMDD.xlsx   (e.g. Combined_20260611.xlsx)
+
+  If a file with the same name already exists:
+    Combined_20260611_1.xlsx, Combined_20260611_2.xlsx...
+
+  If two selected sheets have the same name, the second is
+  automatically renamed with a suffix:
+    Summary  ->  Summary_2
+
+  All source files are not modified.
+
+
+----------------------------------------------------------------
+  LIMITATIONS AND NOTES
+----------------------------------------------------------------
+
+  File letters   : No limit. Files are assigned a, b, ..., z,
+                   then aa, ab, ..., az, ba, ... and so on.
+
+  Range syntax   : Ranges must use the same letter prefix.
+                   a1-a4 is valid. a1-b4 is not supported —
+                   list cross-file sheets individually.
+
+  Hidden sheets  : Not listed, cannot be selected.
+
+  Sheet order    : Output follows your input order exactly,
+                   not the original tab order in the file.
+
+  Unreadable file: If a file cannot be opened, you will be
+                   prompted to skip it or quit.
+
+
+----------------------------------------------------------------
+  FOR DEVELOPER
+----------------------------------------------------------------
+
+  Dependencies
+  ------------
+  - win32com.client  (pywin32)
+  - Microsoft Excel must be installed
+
+  Sheet Enumeration
+  -----------------
+  Each source file is opened read-only via Workbooks.Open().
+  Visible sheets (Visible == -1) are collected and assigned
+  codes (a1, a2, b1...). Workbooks closed after enumeration.
+  Unreadable files prompt S to skip / Enter to quit.
+
+  Selection Parsing
+  -----------------
+  Tokens split on spaces and commas. Pure alpha tokens
+  (no digits) expand to all sheets of that file. Range
+  tokens expanded to individual codes. Cross-prefix ranges
+  rejected. Duplicates silently skipped (seen set).
+
+  Copy Method
+  -----------
+  Source workbooks reopened read-only as needed and cached.
+  Each sheet copied using sheet.Copy(Before=dummy) where
+  dummy is a placeholder at position 1. After all copies,
+  dummy deleted. Preserves all formatting, formulas, print
+  areas, and named ranges.
+
+  Name Collision
+  --------------
+  unique_sheet_name() checks existing names before each
+  copy. Appends _2, _3, etc. until unique.
+
+  Output Naming
+  -------------
+  get_unique_path() checks for existing files and appends
+  _1, _2, etc. to avoid overwriting.
+
+  quit Handling
+  -------------
+  Detected at both input prompts. Breaks the while loop
+  cleanly. xl_app.Quit() always runs in finally block.
+  Closing the console window also terminates safely as
+  win32com COM instance is closed by the finally block
+  only on clean exit — force-closing may leave Excel.exe
+  in background; use Office Process Checker to clean up.
+
+
+----------------------------------------------------------------
+  ENVIRONMENT SETUP (one-time only)
+----------------------------------------------------------------
+
+  Python Version
+  --------------
+  Python 3.8 or above
+
+  Required Package
+  ----------------
+  Run once in Command Prompt:
+
+    pip install pywin32
+
+  Microsoft Excel must be installed on the machine.
+
+
+----------------------------------------------------------------
+  TROUBLESHOOTING
+----------------------------------------------------------------
+
+  Error / Symptom                    Cause / Fix
+  --------------------------------   ----------------------------------------
+  Window opens and closes instantly  pywin32 not installed
+                                     Run: pip install pywin32
+
+  No Excel files found               Files must be in the SAME folder
+                                     as Combine Excel Tabs.py
+
+  Sheet not in list                  Sheet is hidden — unhide in Excel first
+
+  [SKIP] 'xx' not recognised         Code not in list — check and re-enter
+
+  [SKIP] Cross-prefix range          Range spans two files — list individually
+
+  Output has _2 suffix on sheet      Two sheets had the same name —
+                                     rename manually if needed
+
+  Excel.exe left in background       Console was force-closed mid-run
+                                     Use Office Process Checker to kill it
+
+
+----------------------------------------------------------------
+  CONTACT
+----------------------------------------------------------------
+
+  Developed by : H Sun
+  Last updated : June 2026
+
+================================================================
