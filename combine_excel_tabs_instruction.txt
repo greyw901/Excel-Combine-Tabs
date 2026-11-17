@@ -1,5 +1,5 @@
 ================================================================
-  Combine Excel Tabs — User Instruction
+  Combine Excel Tabs — Instruction
 ================================================================
 
 ----------------------------------------------------------------
@@ -7,106 +7,149 @@
 ----------------------------------------------------------------
 
 PURPOSE
-  Selects specific sheets from multiple Excel files in the
-  same folder and combines them into one new workbook, in
-  the order you specify.
+  Picks sheets from several Excel files in the same folder and
+  puts them together in one new workbook, in the order you type.
 
-  Replaces the manual process of opening each file and
-  using Move or Copy Sheet one by one.
+  Replaces opening each file and using Move or Copy Sheet one
+  by one.
 
 STEP 1: Prepare Folder
-  Put the following in the SAME folder:
+  Put these in the SAME folder:
     - Combine Excel Tabs.py
-    - All Excel source files (.xls / .xlsx / .xlsm / .xlsb)
+    - The Excel files to take sheets from (.xls / .xlsx / .xlsm / .xlsb)
 
-  Note: Only visible sheets are listed. Hidden sheets are
-        not shown and cannot be selected.
+  You can keep the source files open in Excel while it runs.
+  The script uses its own hidden copy of Excel and does not
+  touch the Excel you are working in.
 
 STEP 2: Run
   Double-click: Combine Excel Tabs.py
 
-STEP 3: Read the Sheet List
-  The script lists all visible sheets from every Excel file:
+STEP 3: Select Files
+  Every Excel file in the folder is listed with a letter:
 
-    a - Job Summary.xlsx
-      a1 - Summary
-      a2 - Details
-      a3 - Movement
+    Select FILES:
+    e.g. a, c   or   a-c
 
-    b - Job Status Report.xlsx
-      b1 - J153
-      b2 - J154
-      b3 - J155
+       [a] "Bank Balance Report FY2026.xls"
+       [b] "Bank Guarantee Report FY2026.xls"
 
-  Files are assigned letters (a, b, c..., z, aa, ab...)
-  in alphabetical order by filename.
+    --------------------------------------------------------
+    [Enter] Select all
+    [#] Select
+    [0] Exit
 
-STEP 4: Enter Selection
-  At the prompt, type your selection and press Enter:
+    Files:
 
-    Enter selection (e.g. a1, b1-b4, a3), or 'quit' to exit:
+  Type    a, c    for files a and c
+          a-c     for files a, b and c
+  Press [Enter] alone for all files.
 
-  Input syntax:
-    a1          : single sheet
-    b1-b4       : range within same file (b1, b2, b3, b4)
-    a           : all sheets from file a
-    a1, b, a3   : mix of singles, ranges, and full files
-    quit        : exit without doing anything
+  Only the files you pick are opened, so this step is quick
+  even when the folder has many files.
 
-  Sheets are copied in the ORDER you type them.
-  Commas and spaces are both accepted as separators.
-  You can also close the console window at any time to exit.
+STEP 4: Select Sheets
+  The visible sheets of the chosen files are listed. Each
+  file KEEPS its letter from Step 3 (pick a and c, and the
+  codes are a1, a2... and c1, c2..., not b).
+
+       [b] "Bank Guarantee Report FY2026.xls"
+          [b1] May26
+          [b2] Imp LC May26
+          [b3] Exp LC May26
+          ...
+
+  Input:
+    a1            one sheet
+    a3-4          range in one file (a3, a4) - same as a3-a4
+    a             every sheet of file a
+    a3-4, b12, c12   any mix
+  Press [Enter] alone for every sheet of every chosen file.
+  [0] goes back to Step 3.
+
+  Sheets are copied in the ORDER you type them. Commas and
+  spaces both work as separators. A sheet typed twice is
+  copied once.
+
+  A typing mistake redraws the screen with the reason, e.g.
+    Error: Invalid Input - range 'a4-a1' must be ascending
 
 STEP 5: Confirm
-  After entering your selection, a summary is shown:
+  The final list is shown, with any renamed sheets and the
+  output name:
 
-    Selection summary (4 sheet(s)):
-      Job Summary.xlsx
-        a1 - Summary
-        a3 - Movement
-      Job Status Report.xlsx
-        b1 - J153
-        b2 - J154
+    Sheets: 4
+       1. "Bank Balance Report FY2026.xls"!May26
+       2. "Bank Guarantee Report FY2026.xls"!May26   ->   "May26_1"
+       3. "Bank Guarantee Report FY2026.xls"!Imp LC May26
+       4. "Bank Guarantee Report FY2026.xls"!Exp LC May26
 
-    Proceed? Y / Enter to confirm, N to re-enter, 'quit' to exit:
+    Output : "Combined_20261117.xlsx"
 
-  Y or Enter  : proceed with copy
-  N           : go back and re-enter selection
-  quit        : exit without doing anything
+    [Enter] Continue
+    [0] Back
+    [00] Cancel & exit
+
+  If a picked sheet has formulas that read from a sheet you
+  did NOT pick, it is listed and you must choose:
+
+    Linked to unselected sheets: 1
+       1. "Bank Guarantee Report FY2026.xls"!Imp LC May26   :   uses "May26" (b1), not selected
+
+    [1] Keep the link to the source file
+    [2] Turn those formulas into plain values
+    [0] Back
+    [00] Cancel & exit
+
+    [1]  formulas keep reading from the original file. The
+         numbers update if that file changes, but the new
+         workbook depends on it staying in the same place.
+    [2]  those formulas are replaced by the number they show
+         now. The new workbook stands on its own.
+    [0]  go back and add the missing sheet (b1 above) instead.
 
 STEP 6: Output
   A new file is created in the same folder:
 
-    Combined_YYYYMMDD.xlsx   (e.g. Combined_20260611.xlsx)
+    Combined_YYYYMMDD.xlsx   (e.g. Combined_20261117.xlsx)
 
-  If a file with the same name already exists:
-    Combined_20260611_1.xlsx, Combined_20260611_2.xlsx...
+  Same-day runs: Combined_20261117_1.xlsx, _2 ...
 
-  If two selected sheets have the same name, the second is
-  automatically renamed with a suffix:
-    Summary  ->  Summary_2
+  Two sheets with the same name: the second gets _1, the
+  third _2 ...      May26  ->  May26_1
 
-  All source files are not modified.
+  Formulas between sheets you picked together keep working
+  inside the new workbook (they do not point back to the
+  source file).
+
+  Source files are never changed.
+
+  If anything failed, the last screen offers
+    [0] Save error log & close
+  which writes error log_YYYYMMDD.txt to the folder. Send that
+  file when asking for help.
 
 
 ----------------------------------------------------------------
   LIMITATIONS AND NOTES
 ----------------------------------------------------------------
 
-  File letters   : No limit. Files are assigned a, b, ..., z,
-                   then aa, ab, ..., az, ba, ... and so on.
+  Hidden sheets   : Not listed, cannot be picked. A picked
+                    sheet that reads from a hidden sheet is
+                    flagged in Step 5 like any unpicked sheet.
 
-  Range syntax   : Ranges must use the same letter prefix.
-                   a1-a4 is valid. a1-b4 is not supported —
-                   list cross-file sheets individually.
+  Ranges          : One file at a time. a1-a4 / a1-4 work;
+                    a1-b4 does not - list them separately.
 
-  Hidden sheets  : Not listed, cannot be selected.
+  Previous output : Combined_*.xlsx files in the folder are
+                    listed in Step 3 like any other file.
 
-  Sheet order    : Output follows your input order exactly,
-                   not the original tab order in the file.
+  Macros (.xlsm)  : Sheets are copied, macros are not - the
+                    output is .xlsx. Macros in source files
+                    never run.
 
-  Unreadable file: If a file cannot be opened, you will be
-                   prompted to skip it or quit.
+  Password files  : Listed as unreadable in Step 4; the script
+                    does not ask for the password.
 
 
 ----------------------------------------------------------------
@@ -115,49 +158,55 @@ STEP 6: Output
 
   Dependencies
   ------------
-  - win32com.client  (pywin32)
-  - Microsoft Excel must be installed
+  - win32com.client (pywin32)
+  - Microsoft Excel installed
 
-  Sheet Enumeration
-  -----------------
-  Each source file is opened read-only via Workbooks.Open().
-  Visible sheets (Visible == -1) are collected and assigned
-  codes (a1, a2, b1...). Workbooks closed after enumeration.
-  Unreadable files prompt S to skip / Enter to quit.
-
-  Selection Parsing
-  -----------------
-  Tokens split on spaces and commas. Pure alpha tokens
-  (no digits) expand to all sheets of that file. Range
-  tokens expanded to individual codes. Cross-prefix ranges
-  rejected. Duplicates silently skipped (seen set).
-
-  Copy Method
-  -----------
-  Source workbooks reopened read-only as needed and cached.
-  Each sheet copied using sheet.Copy(Before=dummy) where
-  dummy is a placeholder at position 1. After all copies,
-  dummy deleted. Preserves all formatting, formulas, print
-  areas, and named ranges.
-
-  Name Collision
+  Excel Instance
   --------------
-  unique_sheet_name() checks existing names before each
-  copy. Appends _2, _3, etc. until unique.
+  DispatchEx, not Dispatch: Dispatch attaches to the user's
+  running Excel, and Quit() with DisplayAlerts off would close
+  their unsaved work. AutomationSecurity = 3 stops source
+  macros running on open. Calculation is set to manual after
+  the first Open and back to automatic before the output is
+  saved (the mode is stored in the file).
+
+  Reading Sources
+  ---------------
+  Only files picked in Step 3 are opened (read-only,
+  UpdateLinks=0, dummy Password so protected files raise
+  instead of prompting). Each stays open until the end and is
+  reused when the user goes back. While open, each visible
+  worksheet's UsedRange.Formula is read once and scanned
+  (REF_RE) for references to other sheets in the same file.
+  ~$ lock files are skipped.
+
+  Copy
+  ----
+  Sheet.Copy(Before=placeholder) into a one-sheet new workbook,
+  then renamed to its final name. Final names are worked out
+  before the copy (case-insensitive, 31-char limit, _1, _2...).
+
+  Relinking
+  ---------
+  Copying one sheet turns its references to other sheets into
+  external links to the source file. After SaveAs, each source
+  is relinked with ChangeLink(source -> output itself), which
+  resolves by sheet NAME. So copies briefly take their source
+  names (other sheets holding those names step aside to temp
+  names), ChangeLink runs, then names are restored; renames
+  update formulas automatically.
+
+  ChangeLink must not run while a referenced sheet is missing:
+  tested on May26 - it silently pointed at the OTHER file's
+  May26 sheet. So:
+    keep   -> that source is not relinked at all
+    values -> cells whose formula hits a missing sheet are
+              set to their own value first, then relinked
 
   Output Naming
   -------------
-  get_unique_path() checks for existing files and appends
-  _1, _2, etc. to avoid overwriting.
-
-  quit Handling
-  -------------
-  Detected at both input prompts. Breaks the while loop
-  cleanly. xl_app.Quit() always runs in finally block.
-  Closing the console window also terminates safely as
-  win32com COM instance is closed by the finally block
-  only on clean exit — force-closing may leave Excel.exe
-  in background; use Office Process Checker to clean up.
+  Combined_YYYYMMDD.xlsx is a deliberate choice over the
+  no-date deliverable rule. get_unique_path() adds _1, _2...
 
 
 ----------------------------------------------------------------
@@ -189,14 +238,7 @@ STEP 6: Output
   No Excel files found               Files must be in the SAME folder
                                      as Combine Excel Tabs.py
 
-  Sheet not in list                  Sheet is hidden — unhide in Excel first
-
-  [SKIP] 'xx' not recognised         Code not in list — check and re-enter
-
-  [SKIP] Cross-prefix range          Range spans two files — list individually
-
-  Output has _2 suffix on sheet      Two sheets had the same name —
-                                     rename manually if needed
+  Sheet not in list                  Sheet is hidden - unhide in Excel first
 
   Excel.exe left in background       Console was force-closed mid-run
                                      Use Office Process Checker to kill it
@@ -206,7 +248,7 @@ STEP 6: Output
   CONTACT
 ----------------------------------------------------------------
 
-  Developed by : H Sun
-  Last updated : June 2026
+  Author: Yeoh Huey Sun
+  Last updated : November 2026
 
 ================================================================
